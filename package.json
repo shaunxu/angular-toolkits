@@ -1,0 +1,25 @@
+{
+  "name": "angular-toolkits",
+  "version": "1.0.0",
+  "description": "Shaun's Angular.js Toolkits",
+  "main": "web-server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shaunxu/angular-toolkits.git"
+  },
+  "keywords": [
+    "angular"
+  ],
+  "author": "Shaun Xu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shaunxu/angular-toolkits/issues"
+  },
+  "dependencies": {
+    "body-parser": "~1.6.5",
+    "compression": "~1.0.11",
+    "express": "~4.8.5",
+    "log4js": "~0.6.19",
+    "optimist": "~0.6.1"
+  }
+}
