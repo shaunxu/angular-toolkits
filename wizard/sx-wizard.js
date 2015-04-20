@@ -36,7 +36,7 @@
                         size: 'lg',
                         backdrop: 'static',
                         title: 'Wizard',
-                        template: $wizardConsts.template,
+                        templateUrl;: $wizardConsts.template,
                         shadow: true
                     }
                 };
@@ -66,7 +66,7 @@
 
                     $q.all(_stepTemplatePromises).then(function() {
                         var instance = $modal.open({
-                            templateUrl: '$sx-ngtk/wizard/wizard.html',
+                            templateUrl: _options.templateUrl,
                             controller: function($scope, $modalInstance, $data, $steps, $stepsOrder) {
                                 $scope.$data = $data;
                                 $scope.$steps = $steps;
