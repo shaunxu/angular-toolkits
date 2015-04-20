@@ -111,7 +111,7 @@
                                 $scope._onLeaving = function(toIndex, toStep, callback) {
                                     // current step might be "undefined" when wizard was shown firstly
                                     if ($scope.$current.step) {
-                                        var leaving = $scope.$current.step.$context.behaviour.leaving;
+                                        var leaving = $scope.$current.step.$context.behavior.leaving;
                                         var options = {
                                             toStepId: toStep && toStep.id,
                                             forward: $scope.$current.index <= toIndex
@@ -129,7 +129,7 @@
                                 };
 
                                 $scope._onEntering = function(fromIndex, fromStep, callback) {
-                                    var entering = $scope.$current.step.$context.behaviour.entering;
+                                    var entering = $scope.$current.step.$context.behavior.entering;
                                     var options = {
                                         fromStepId: fromStep && fromStep.id,
                                         forward: fromIndex <= $scope.$current.index,
@@ -258,7 +258,7 @@
                                 nextStepId: null,
                                 buttons: []
                             },
-                            behaviour: {
+                            behavior: {
                                 entering: function(options, callback) {
                                     return callback();
                                 },
