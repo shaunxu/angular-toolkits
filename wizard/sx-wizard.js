@@ -36,7 +36,7 @@
                         size: 'lg',
                         backdrop: 'static',
                         title: 'Wizard',
-                        templateUrl;: $wizardConsts.template,
+                        templateUrl: $wizardConsts.template,
                         shadow: true
                     }
                 };
