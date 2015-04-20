@@ -66,7 +66,7 @@
 
                     $q.all(_stepTemplatePromises).then(function() {
                         var instance = $modal.open({
-                            templateUrl: _options.templateUrl,
+                            templateUrl: self._options.templateUrl,
                             controller: function($scope, $modalInstance, $data, $steps, $stepsOrder) {
                                 $scope.$data = $data;
                                 $scope.$steps = $steps;
