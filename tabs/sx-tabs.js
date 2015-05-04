@@ -12,11 +12,11 @@
         };
     }]);
     
-    module.directive('sxTabs', ['$q', '$http', '$controller', '$compile', '$templateCache', '$timeout', '$sxTabsUtilities', '$tabsConsts',
-        function ($q, $http, $controller, $compile, $templateCache, $timeout, $sxTabsUtilities, $tabsConsts) {
+    module.directive('sxTabs', ['$q', '$http', '$controller', '$compile', '$templateCache', '$timeout', '$tabsConsts',
+        function ($q, $http, $controller, $compile, $templateCache, $timeout, $tabsConsts) {
             return {
                 scope: { 
-                    $options: '=sxTabsOptions',
+                    $options: '@sxTabsOptions',
                     $tabs: '=sxTabs',
                     $context: '=sxTabsContext',
                     $onTabEnabled: '&sxTabsEnabled',
@@ -256,7 +256,6 @@
                     // also split tabs into enabled and disabled array
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
-                        tab.$elementId = $sxTabsUtilities.getElementId(tab.id);
                         _setTemplatePromise(tab);
                         
                         if (tab.enabled && !_firstEnabledTabId) {
