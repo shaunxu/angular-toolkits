@@ -3,14 +3,7 @@
     
     var module = window.angular.module('sx.tabs', ['sx.tabs.tpls']);
     
-    module.factory('$sxTabsUtilities', [function () {
-        return {
-            elementIdPrifixing: 'sx-tab-',
-            getElementId: function (tabId) {
-                return this.elementIdPrifixing + tabId;
-            }
-        };
-    }]);
+
     
     module.directive('sxTabs', ['$q', '$http', '$controller', '$compile', '$templateCache', '$timeout', '$tabsConsts',
         function ($q, $http, $controller, $compile, $templateCache, $timeout, $tabsConsts) {
@@ -154,7 +147,7 @@
                         }
                     };
                     
-                    scope.switchTab = function (e, id, manually) {
+                    scope.switchTab = function (e, id) {
                         // skip the default behavior
                         // which will navigate to the bookmark place
                         if (e) {
@@ -180,7 +173,7 @@
                                                     _toggleCover(true, function () {
                                                         // perform tab's entering logic
                                                         _performEntering(fromTabId, tab, function () {
-                                                            _toggleCover(false, function () {});
+                                                            _toggleCover(false, window.angular.noop);
                                                         });
                                                     }); 
                                                 });
@@ -192,12 +185,12 @@
                         }
                     };
 
-                    scope.enableTab = function (id, index) {
+                    scope.enableTab = function (id) {
                         var tab = scope.$tabs[id];
                         if (tab && !tab.enabled) {
                             // _appendTabHtml(tab);
                             tab.enabled = true;
-                            scope.switchTab(null, id, true);
+                            scope.switchTab(null, id);
                             scope.$onTabEnabled({tab: tab});
                             _getAndUpdateTabsPlusIconFlag();
                         }
@@ -241,7 +234,7 @@
                                 if (valid) {
                                     if (scope.activeTab && scope.activeTab.id === tab.id) {
                                         var targetTabId = _getNextEnabledTabId(tab.id);
-                                        scope.switchTab(null, targetTabId, true);
+                                        scope.switchTab(null, targetTabId);
                                     }
                                     tab.enabled = false;
                                     scope.$onTabDisabled({tab: tab});
@@ -264,7 +257,7 @@
                     });
 
                     // switch to the first enabled tab
-                    scope.switchTab(null, _firstEnabledTabId, true);
+                    scope.switchTab(null, _firstEnabledTabId);
                 }
             };
         }

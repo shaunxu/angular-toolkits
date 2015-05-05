@@ -9,7 +9,7 @@
 
     module.run(['$templateCache', '$tabsConsts',
         function($templateCache, $tabsConsts) {
-            $templateCache.put($tabsConsts.template, '' +
+            $templateCache.put($tabsConsts.template,
                 '<div role="tabpanel" class="sx-tabs">' +
                 '    <ul class="nav nav-tabs sx-tabs-navigation">' +
                 '        <li role="presentation" ' +
@@ -17,7 +17,7 @@
                 '            ng-class="tab.id === activeTab.id ? \'active\' : \'\'"' +
                 '            ng-show="tab.enabled"' +
                 '            sx-tab-nav-id="{{tab.id}}">' +
-                '            <a href="javascript:void(0)" ng-click="switchTab($event, tab.id, false)">' +
+                '            <a href="javascript:void(0)" ng-click="switchTab($event, tab.id)">' +
                 '                <button class="close nav-close" ' +
                 '                        type="button" ' +
                 '                        ng-click="disableTab($event, tab.id)">×' +
@@ -82,8 +82,8 @@
                 '        margin-left: auto;' +
                 '        margin-right: auto; ' +
                 '    }' +
-                '</style>' +
-                '');
+                '</style>'
+            );
         }
     ]);
 }());
