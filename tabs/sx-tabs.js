@@ -29,21 +29,7 @@
                             }
                         }
                     }, scope.$options);
-                    scope.$tabs = scope.$tabs || {};
-                    scope.$tabsOrder = (function () {
-                        var orders = [];
-                        window.angular.forEach(scope.$tabs, function (tab) {
-                            orders.push({
-                                id: tab.id,
-                                order: tab.order,
-                                enabled: tab.enabled
-                            });
-                        });
-                        orders.sort(function (x, y) {
-                            return x.order - y.order;
-                        });
-                        return orders;
-                    }());
+
                     scope.$context = scope.$context || {}; 
                     scope.$onTabEnabled = scope.$onTabEnabled || window.angular.noop;
                     scope.$onTabDisabled = scope.$onTabDisabled || window.angular.noop; 
@@ -289,6 +275,22 @@
                         }
                     };
 
+                    $q.when(scope.$tabs).then(function (tabs) {
+                        scope.$tabs = tabs;
+                        scope.$tabsOrder = (function () {
+                            var orders = [];
+                            window.angular.forEach(scope.$tabs, function (tab) {
+                                orders.push({
+                                    id: tab.id,
+                                    order: tab.order,
+                                    enabled: tab.enabled
+                                });
+                            });
+                            orders.sort(function (x, y) {
+                                return x.order - y.order;
+                            });
+                            return orders;
+                        }());
                     // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
@@ -301,17 +303,18 @@
                         id: (function () {
                             var firstEnabledTabId = null;
                             var i = 0;
-                            var id = null;
                             while (i <= scope.$tabsOrder.length - 1) {
                                 if (scope.$tabsOrder[i].enabled) {
                                     firstEnabledTabId = scope.$tabsOrder[i].id;
                                     break;
                                 }
+                                    i = i + 1;
                             }
                             return firstEnabledTabId;
                         }()),
                         byTabDisabled: true
                     }, window.angular.noop);
+                    });
                 }
             };
         }
