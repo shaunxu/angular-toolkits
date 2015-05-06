@@ -44,7 +44,7 @@
                         scope.showTabsPlusIcon = result;
                         return result;
                     };
-                    scope.showTabsPlusIcon = _getAndUpdateTabsPlusIconFlag();
+
                     
                     var _toggleCover = function (showCover, callback) {
                         var containerElement = element.find('.sx-tabs-container');
@@ -291,6 +291,7 @@
                             });
                             return orders;
                         }());
+                        scope.showTabsPlusIcon = _getAndUpdateTabsPlusIconFlag();
                     // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
