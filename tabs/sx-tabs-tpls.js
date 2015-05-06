@@ -46,8 +46,6 @@
                 '        </div>' +
                 '    </div>' +
                 '</div>' +
-                '<pre>{{$tabsOrder | json}}</pre>' +
-                '<pre>{{$tabs | json}}</pre>' +
                 '<style>' +
                 '    .nav-tabs>li>a {' +
                 '        border: 1px solid #ddd;' +
