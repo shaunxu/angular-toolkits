@@ -13,27 +13,19 @@
                 '<div role="tabpanel" class="sx-tabs">' +
                 '    <ul class="nav nav-tabs sx-tabs-navigation">' +
                 '        <li role="presentation" ' +
-                '            ng-repeat="tab in $tabs track by $index"' +
-                '            ng-class="tab.id === activeTab.id ? \'active\' : \'\'"' +
-                '            ng-show="tab.enabled"' +
-                '            sx-tab-nav-id="{{tab.id}}">' +
-                '            <a href="javascript:void(0)" ng-click="switchTab($event, tab.id)">' +
-                '                <button class="close nav-close" ' +
-                '                        type="button" ' +
-                '                        ng-click="disableTab($event, tab.id)">×' +
-                '                </button>{{tab.title}} ' +
-                '            </a> ' +
+                '            ng-repeat="tab in $tabsOrder track by $index"' +
+                '            ng-class="$tabs[tab.id].id === activeTab.id ? \'active\' : \'\'"' +
+                '            ng-show="$tabs[tab.id].enabled"' +
+                '            sx-tab-nav-id="{{$tabs[tab.id].id}}">' +
+                '            <a href="javascript:void(0)" ng-click="switchTab({e: $event, id: $tabs[tab.id].id, byTabDisabled: false}, window.angular.noop)"><button class="close nav-close" type="button" ng-click="disableTab($event, tab.id)">×</button>{{$tabs[tab.id].title}}</a> ' +
                 '        </li>' +
                 '        <li class="sx-tabs-nav-plus" ng-show="showTabsPlusIcon">' +
                 '            <a class="dropdown-toggle" style="cursor: pointer;" data-toggle="dropdown">' +
                 '                <span class="glyphicon glyphicon-plus"></span>' +
                 '            </a>' +
                 '            <ul class="dropdown-menu" role="menu">' +
-                '                <li ng-repeat="tab in $tabs track by $index">' +
-                '                    <a ng-click="enableTab(tab.id, $index)" ' +
-                '                       ng-hide="tab.enabled"' +
-                '                       href="javascript:void(0)">{{tab.title}}' +
-                '                    </a>' +
+                '                <li ng-repeat="tab in $tabsOrder track by $index">' +
+                '                    <a ng-click="enableTab($tabs[tab.id].id, $index)" ng-hide="$tabs[tab.id].enabled" href="javascript:void(0)">{{$tabs[tab.id].title}}</a>' +
                 '                </li>' +
                 '            </ul>' +
                 '        </li>' +
@@ -47,13 +39,15 @@
                 '            </div>' +
                 '        </div>' +
                 '        <div role="tabpanel" ' +
-                '             ng-repeat="tab in $tabs track by $index"' +
-                '             sx-tab-id="{{tab.id}}"' +
+                '             ng-repeat="tab in $tabsOrder track by $index"' +
+                '             sx-tab-id="{{$tabs[tab.id].id}}"' +
                 '             class="tab-wrapper"' +
-                '             ng-show="tab.id === activeTab.id">' +
+                '             ng-show="$tabs[tab.id].id === activeTab.id">' +
                 '        </div>' +
                 '    </div>' +
                 '</div>' +
+                '<pre>{{$tabsOrder | json}}</pre>' +
+                '<pre>{{$tabs | json}}</pre>' +
                 '<style>' +
                 '    .nav-tabs>li>a {' +
                 '        border: 1px solid #ddd;' +

@@ -3,8 +3,6 @@
     
     var module = window.angular.module('sx.tabs', ['sx.tabs.tpls']);
     
-
-    
     module.directive('sxTabs', ['$q', '$http', '$controller', '$compile', '$templateCache', '$timeout', '$tabsConsts',
         function ($q, $http, $controller, $compile, $templateCache, $timeout, $tabsConsts) {
             return {
@@ -32,6 +30,20 @@
                         }
                     }, scope.$options);
                     scope.$tabs = scope.$tabs || {};
+                    scope.$tabsOrder = (function () {
+                        var orders = [];
+                        window.angular.forEach(scope.$tabs, function (tab) {
+                            orders.push({
+                                id: tab.id,
+                                order: tab.order,
+                                enabled: tab.enabled
+                            });
+                        });
+                        orders.sort(function (x, y) {
+                            return x.order - y.order;
+                        });
+                        return orders;
+                    }());
                     scope.$context = scope.$context || {}; 
                     scope.$onTabEnabled = scope.$onTabEnabled || window.angular.noop;
                     scope.$onTabDisabled = scope.$onTabDisabled || window.angular.noop; 
@@ -88,11 +100,12 @@
                         }
                     };
 
-                    var _performLeaving = function (fromTab, toTab, callback) {
+                    var _performLeaving = function (fromTab, toTab, byTabDisable, callback) {
                         scope.leaving = true;
                         if (fromTab && fromTab.$scope) {
                             var options = {
-                                toTabId: toTab.id
+                                toTabId: toTab.id,
+                                byTabDisable: byTabDisable
                             };
                             fromTab.$scope.$context.behavior.leaving(options, function (valid) {
                                 scope.leaving = false;
@@ -147,7 +160,12 @@
                         }
                     };
                     
-                    scope.switchTab = function (e, id) {
+                    scope.switchTab = function (options, callback) {
+                        callback = callback || window.angular.noop;
+                        var e = options.e;
+                        var id = options.id;
+                        var byTabDisabled = options.byTabDisabled;
+                        
                         // skip the default behavior
                         // which will navigate to the bookmark place
                         if (e) {
@@ -164,7 +182,7 @@
                                 $q.when(tab.$templatePromise).then(function () { 
                                     _toggleCover(true, function () {
                                         // perform tab's leaving logic
-                                        _performLeaving(scope.activeTab, tab, function (valid) {
+                                        _performLeaving(scope.activeTab, tab, byTabDisabled, function (valid) {
                                             if (valid) {
                                                 // invoke tab's controller for the first time
                                                 _compileTabContent(tab, function () {
@@ -173,15 +191,26 @@
                                                     _toggleCover(true, function () {
                                                         // perform tab's entering logic
                                                         _performEntering(fromTabId, tab, function () {
-                                                            _toggleCover(false, window.angular.noop);
+                                                            _toggleCover(false, function () {
+                                                                return callback(true);
+                                                            });
                                                         });
                                                     }); 
                                                 });
+                                            }
+                                            else {
+                                                return callback(false);
                                             }
                                         });
                                     });
                                 });
                             }
+                            else {
+                                return callback(false);
+                            }
+                        }
+                        else {
+                            return callback(false);
                         }
                     };
 
@@ -190,9 +219,14 @@
                         if (tab && !tab.enabled) {
                             // _appendTabHtml(tab);
                             tab.enabled = true;
-                            scope.switchTab(null, id);
-                            scope.$onTabEnabled({tab: tab});
-                            _getAndUpdateTabsPlusIconFlag();
+                            scope.switchTab({
+                                e: null,
+                                id: id,
+                                byTabDisabled: false
+                            }, function (switched) {
+                                scope.$onTabEnabled({tab: tab});
+                                _getAndUpdateTabsPlusIconFlag();
+                            });
                         }
                     };
                     
@@ -221,6 +255,12 @@
                         return enabledTabIds[targetIndex];
                     };
                     
+                    var _disableTab = function (tab) {
+                        tab.enabled = false;
+                        scope.$onTabDisabled({tab: tab});
+                        _getAndUpdateTabsPlusIconFlag();
+                    };
+                    
                     scope.disableTab = function (e, id) {
                         // do not navigate tab since we need remove this tab
                         if (e) {
@@ -230,34 +270,48 @@
                         
                         var tab = scope.$tabs[id];
                         if (tab && tab.enabled) {
-                            _performLeaving(scope.activeTab, tab, function (valid) {
-                                if (valid) {
-                                    if (scope.activeTab && scope.activeTab.id === tab.id) {
-                                        var targetTabId = _getNextEnabledTabId(tab.id);
-                                        scope.switchTab(null, targetTabId);
+                            if (scope.activeTab && scope.activeTab.id === tab.id) {
+                                var targetTabId = _getNextEnabledTabId(tab.id);
+                                // switch will trigger validation and will disable this tab when switched (validation success)
+                                scope.switchTab({
+                                    e: null,
+                                    id: targetTabId,
+                                    byTabDisabled: true
+                                }, function (switched) {
+                                    if (switched) {
+                                        _disableTab(tab);
                                     }
-                                    tab.enabled = false;
-                                    scope.$onTabDisabled({tab: tab});
-                                    _getAndUpdateTabsPlusIconFlag();
-                                }
-                            });
+                                });
+                            }
+                            else {
+                                _disableTab(tab);
+                            }
                         }
                     };
 
-                    var _firstEnabledTabId = null;
-                    // load template for visible tabs in orders
-                    // also split tabs into enabled and disabled array
+                    // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
                         _setTemplatePromise(tab);
-                        
-                        if (tab.enabled && !_firstEnabledTabId) {
-                            _firstEnabledTabId = tab.id;
-                        }
                     });
 
                     // switch to the first enabled tab
-                    scope.switchTab(null, _firstEnabledTabId);
+                    scope.switchTab({
+                        e: null,
+                        id: (function () {
+                            var firstEnabledTabId = null;
+                            var i = 0;
+                            var id = null;
+                            while (i <= scope.$tabsOrder.length - 1) {
+                                if (scope.$tabsOrder[i].enabled) {
+                                    firstEnabledTabId = scope.$tabsOrder[i].id;
+                                    break;
+                                }
+                            }
+                            return firstEnabledTabId;
+                        }()),
+                        byTabDisabled: true
+                    }, window.angular.noop);
                 }
             };
         }
