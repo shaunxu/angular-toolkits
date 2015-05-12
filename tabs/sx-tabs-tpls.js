@@ -74,6 +74,13 @@
                 '        margin-left: auto;' +
                 '        margin-right: auto; ' +
                 '    }' +
+                '    .sx-tabs-container {' +
+                '        border: 1px solid #ddd;' +
+                '        border-top-color: transparent;' +
+                '    }' +
+                '    .tab-wrapper {' +
+                '        padding: 10px' +
+                '    }' +
                 '</style>'
             );
         }

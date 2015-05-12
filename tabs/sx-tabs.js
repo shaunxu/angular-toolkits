@@ -295,6 +295,8 @@
                     // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
+                            delete tab.$scope;
+                            delete tab.$controller;
                         _setTemplatePromise(tab);
                     });
 
