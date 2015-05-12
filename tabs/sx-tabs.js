@@ -275,7 +275,8 @@
                         }
                     };
 
-                    $q.when(scope.$tabs).then(function (tabs) {
+                    $q.when(scope.$tabs)
+                        .then(function (tabs) {
                         scope.$tabs = tabs;
                         scope.$tabsOrder = (function () {
                             var orders = [];
@@ -291,6 +292,10 @@
                             });
                             return orders;
                         }());
+                            return $q.when(scope.$context);
+                        })
+                        .then(function (context) {
+                            scope.$context = context || {};
                         scope.showTabsPlusIcon = _getAndUpdateTabsPlusIconFlag();
                     // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
