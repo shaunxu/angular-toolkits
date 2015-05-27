@@ -62,10 +62,14 @@
                 '  </div>' +
                 '</div>' +
                 '<style>' +
+                '    .modal-dialog {' +
+                '        width: 1000px;' +
+                '        top: 25px;' +
+                '    }' +
                 '    .step-container {' +
                 '        margin-top: 20px;' +
-                '        min-height: 400px;' +
-                '        max-height: 400px;' +
+                '        min-height: 600px;' +
+                '        max-height: 600px;' +
                 '        overflow-y: auto;' +
                 '    }' +
                 '    h1 {' +

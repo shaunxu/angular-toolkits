@@ -3,24 +3,19 @@
 
     var module = window.angular.module('sx.wizard', ['ui.bootstrap', 'sx.wizard.tpls']);
 
-    module.factory('$wizard', ['$q', '$http', '$modal', '$wizardConsts',
-        function($q, $http, $modal, $wizardConsts) {
+    module.factory('$wizard', ['$q', '$http', '$templateCache', '$modal', '$wizardConsts',
+        function ($q, $http, $templateCache, $modal, $wizardConsts) {
             return (function() {
                 var _stepTemplatePromises = [];
 
                 var _getTemplatePromise = function(step) {
                     if (step.template) {
-                        step.template = '' +
-                            '<div class="sx-wizard-step" sx-wizard-step-id="' + step.id + '">' +
-                            step.template +
-                            '</div>';
+                        step.template = '<div class="sx-wizard-step" sx-wizard-step-id="' + step.id + '">' + step.template + '</div>';
                         return $q.when(step);
-                    } else {
-                        return $http.get(step.templateUrl).then(function(response) {
-                            step.template = '' +
-                                '<div class="sx-wizard-step" sx-wizard-step-id="' + step.id + '">' +
-                                response.data +
-                                '</div>';
+                    }
+                    else {
+                        return $http.get(step.templateUrl, { cache: $templateCache }).then(function (response) {
+                            step.template = '<div class="sx-wizard-step" sx-wizard-step-id="' + step.id + '">' + response.data + '</div>';
                             return step;
                         });
                     }
@@ -39,6 +34,9 @@
                         templateUrl: $wizardConsts.template,
                         shadow: true
                     }
+                };
+                wizard.constants = {
+                    finishStepId: '$$finish'
                 };
 
                 wizard.addStep = function(step) {
@@ -67,7 +65,8 @@
                     $q.all(_stepTemplatePromises).then(function() {
                         var instance = $modal.open({
                             templateUrl: self._options.templateUrl,
-                            controller: function($scope, $modalInstance, $data, $steps, $stepsOrder) {
+                            controller: ['$scope', '$modalInstance', '$data', '$steps', '$stepsOrder',
+                                function ($scope, $modalInstance, $data, $steps, $stepsOrder) {
                                 $scope.$data = $data;
                                 $scope.$steps = $steps;
                                 $scope.$stepsOrder = $stepsOrder;
@@ -83,7 +82,8 @@
                                 $scope.$watch(function() {
                                     if ($scope.$current.step && $scope.$current.step.$context && $scope.$current.index >= 0) {
                                         return $scope.$current.step.$context.navigation.showFinish || ($scope.$current.index >= self._stepsOrder.length - 1);
-                                    } else {
+                                    }
+                                    else {
                                         return true;
                                     }
                                 }, function(showFinishButton) {
@@ -123,7 +123,8 @@
                                                 return callback(valid);
                                             }
                                         ]);
-                                    } else {
+                                    }
+                                    else {
                                         return callback(true);
                                     }
                                 };
@@ -147,32 +148,37 @@
 
                                 $scope.goById = function(stepOrId, isPrevious) {
                                     var id = window.angular.isString(stepOrId) ? stepOrId : (stepOrId && stepOrId.id);
-                                    var step = self._steps[id];
-                                    if (step) {
-                                        var index = self._stepsOrder.indexOf(id);
-                                        if (index >= 0) {
-                                            $scope._onLeaving(index, step, function(valid) {
-                                                if (valid) {
-                                                    var fromIndex = $scope.$current.index || -1;
-                                                    var fromStepId = $scope.$current.step && $scope.$current.step.id;
-                                                    // if it is came from previous step and contains history then pop
-                                                    if (isPrevious && $scope._history.length > 0) {
-                                                        $scope._history.pop();
-                                                    }
-                                                    // if it is not came from previous step and has current step then push current into history
-                                                    if (!isPrevious && $scope.$current.step) {
-                                                        $scope._history.push($scope.$current.step.id);
-                                                    }
-                                                    // navigate
-                                                    $scope.$current.index = index;
-                                                    $scope.$current.step = step;
-                                                    $scope._onEntering(fromIndex, self._steps[fromStepId], function() {
-                                                        $scope._showFinishButton = ($scope.$current.index >= self._stepsOrder.length - 1);
-                                                    });
-                                                }
-                                            });
+                                        if (id === self.constants.finishStepId) {
+                                            $scope.success();
                                         }
-                                    }
+                                        else {
+	                                    var step = self._steps[id];
+	                                    if (step) {
+	                                        var index = self._stepsOrder.indexOf(id);
+	                                        if (index >= 0) {
+	                                            $scope._onLeaving(index, step, function(valid) {
+	                                                if (valid) {
+	                                                    var fromIndex = $scope.$current.index || -1;
+	                                                    var fromStepId = $scope.$current.step && $scope.$current.step.id;
+	                                                    // if it is came from previous step and contains history then pop
+	                                                    if (isPrevious && $scope._history.length > 0) {
+	                                                        $scope._history.pop();
+	                                                    }
+	                                                    // if it is not came from previous step and has current step then push current into history
+	                                                    if (!isPrevious && $scope.$current.step) {
+	                                                        $scope._history.push($scope.$current.step.id);
+	                                                    }
+	                                                    // navigate
+	                                                    $scope.$current.index = index;
+	                                                    $scope.$current.step = step;
+	                                                    $scope._onEntering(fromIndex, self._steps[fromStepId], function() {
+	                                                        $scope._showFinishButton = ($scope.$current.index >= self._stepsOrder.length - 1);
+	                                                    });
+	                                                }
+	                                            });
+	                                        }
+	                                    }
+                                        }
                                 };
 
                                 $scope.go = function(index, isPrevious) {
@@ -186,7 +192,8 @@
                                     var nextStepId = $scope.$current.step.$context.navigation.nextStepId;
                                     if (nextStepId) {
                                         $scope.goById(nextStepId, false);
-                                    } else {
+                                    }
+                                    else {
                                         $scope.go($scope.$current.index + 1, false);
                                     }
                                 };
@@ -198,7 +205,8 @@
                                         $scope.goById($scope._history[$scope._history.length - 1], true);
                                     }
                                 };
-                            },
+                                }
+                            ],
                             size: self._options.size,
                             resolve: {
                                 $data: function() {
@@ -233,7 +241,7 @@
                     $data: '=sxWizard',
                     $steps: '=sxWizardSteps',
                     $current: '=sxWizardCurrentStep',
-                    $init: '&sxWizardInit',
+                    $init: '&sxWizardInit'
                 },
                 link: function(scope, element, attributes, controllers) {
                     var _stepElements = [];
@@ -283,7 +291,8 @@
                             window.angular.forEach(_stepElements, function(stepElement) {
                                 if (stepElement.attr('sx-wizard-step-id') === step.id) {
                                     stepElement.show();
-                                } else {
+                                }
+                                else {
                                     stepElement.hide();
                                 }
                             });
