@@ -11,7 +11,8 @@
                     $tabs: '=sxTabs',
                     $context: '=sxTabsContext',
                     $onTabEnabled: '&sxTabsEnabled',
-                    $onTabDisabled: '&sxTabsDisabled'
+                    $onTabDisabled: '&sxTabsDisabled',
+                    $onTabSwitched: '&sxTabSwitched'
                 },
                 templateUrl: $tabsConsts.template,
                 link: function (scope, element) {
@@ -178,6 +179,12 @@
                                                         // perform tab's entering logic
                                                         _performEntering(fromTabId, tab, function () {
                                                             _toggleCover(false, function () {
+                                                                // set this tab as active
+                                                                window.angular.forEach(scope.$tabs, function (t) {
+                                                                    t.isActive = (t.id === tab.id);
+                                                                });
+                                                                // call parent scope tab was switched
+                                                                scope.$onTabSwitched({tab: tab});
                                                                 return callback(true);
                                                             });
                                                         });
@@ -275,6 +282,23 @@
                         }
                     };
 
+                    var _findLandingTab = function () {
+                        var firstEnabledTabId = null;
+                        var firstActiveTabId = null;
+                        var i = 0;
+                        while (i <= scope.$tabsOrder.length - 1) {
+                            if (scope.$tabsOrder[i].enabled && !firstEnabledTabId) {
+                                firstEnabledTabId = scope.$tabsOrder[i].id;
+                            }
+                            if (scope.$tabs[scope.$tabsOrder[i].id].isActive &&
+                                scope.$tabs[scope.$tabsOrder[i].id].enabled &&
+                                !firstActiveTabId) {
+                                firstActiveTabId = scope.$tabsOrder[i].id;
+                            }
+                            i++;
+                        }
+                        return firstActiveTabId || firstEnabledTabId;
+                    };
                     $q.when(scope.$tabs)
                         .then(function (tabs) {
                         scope.$tabs = tabs;
@@ -305,21 +329,11 @@
                         _setTemplatePromise(tab);
                     });
 
-                    // switch to the first enabled tab
+                            // switch to the active tab
+                            // if no active tab or that tab was disabled then go to the first enabled tab
                     scope.switchTab({
                         e: null,
-                        id: (function () {
-                            var firstEnabledTabId = null;
-                            var i = 0;
-                            while (i <= scope.$tabsOrder.length - 1) {
-                                if (scope.$tabsOrder[i].enabled) {
-                                    firstEnabledTabId = scope.$tabsOrder[i].id;
-                                    break;
-                                }
-                                    i = i + 1;
-                            }
-                            return firstEnabledTabId;
-                        }()),
+                                id: _findLandingTab(),
                         byTabDisabled: true
                     }, window.angular.noop);
                     });
