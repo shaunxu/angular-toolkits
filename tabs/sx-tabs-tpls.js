@@ -17,7 +17,10 @@
                 '            ng-class="$tabs[tab.id].id === activeTab.id ? \'active\' : \'\'"' +
                 '            ng-show="$tabs[tab.id].enabled"' +
                 '            sx-tab-nav-id="{{$tabs[tab.id].id}}">' +
-                '            <a href="javascript:void(0)" ng-click="switchTab({e: $event, id: $tabs[tab.id].id, byTabDisabled: false}, window.angular.noop)"><button class="close nav-close" type="button" ng-click="disableTab($event, tab.id)">×</button>{{$tabs[tab.id].title}}</a> ' +
+                '            <a href="javascript:void(0)" ng-click="switchTab({e: $event, id: $tabs[tab.id].id, byTabDisabled: false}, window.angular.noop)">' +
+                '               <button ng-show="enabledTabsCount > 1" class="close nav-close" type="button" ng-click="disableTab($event, tab.id)">&times;</button>' +
+                '               {{$tabs[tab.id].title}}' +
+                '            </a> ' +
                 '        </li>' +
                 '        <li class="sx-tabs-nav-plus" ng-show="showTabsPlusIcon">' +
                 '            <a class="dropdown-toggle" style="cursor: pointer;" data-toggle="dropdown">' +

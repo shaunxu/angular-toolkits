@@ -46,7 +46,16 @@
                         return result;
                     };
 
-                    
+                    var _getAndUpdateEnabledTabsCount = function () {
+                        var result = 0;
+                        window.angular.forEach(scope.$tabs, function (tab) {
+                            if (tab.enabled) {
+                                result++;
+                            }
+                        });
+                        scope.enabledTabsCount = result;
+                        return result;
+                    };
                     var _toggleCover = function (showCover, callback) {
                         var containerElement = element.find('.sx-tabs-container');
                         var coverElement = containerElement.find('div.outer');
@@ -219,6 +228,7 @@
                             }, function (switched) {
                                 scope.$onTabEnabled({tab: tab});
                                 _getAndUpdateTabsPlusIconFlag();
+                                _getAndUpdateEnabledTabsCount();
                             });
                         }
                     };
@@ -252,6 +262,7 @@
                         tab.enabled = false;
                         scope.$onTabDisabled({tab: tab});
                         _getAndUpdateTabsPlusIconFlag();
+                        _getAndUpdateEnabledTabsCount();
                     };
                     
                     scope.disableTab = function (e, id) {
@@ -321,6 +332,7 @@
                         .then(function (context) {
                             scope.$context = context || {};
                         scope.showTabsPlusIcon = _getAndUpdateTabsPlusIconFlag();
+                            scope.enabledTabsCount = _getAndUpdateEnabledTabsCount();
                     // load template for visible tabs
                     window.angular.forEach(scope.$tabs, function (tab) {
                         tab.entered = false;
