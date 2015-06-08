@@ -5,8 +5,6 @@
 
     module.factory('$wizard', ['$q', '$http', '$templateCache', '$modal', '$wizardConsts',
         function ($q, $http, $templateCache, $modal, $wizardConsts) {
-            return (function() {
-                var _stepTemplatePromises = [];
 
                 var _getTemplatePromise = function(step) {
                     if (step.template) {
@@ -21,9 +19,13 @@
                     }
                 };
 
+            return {
+                $new: function (opts) {
+                    var $wizard = this;
                 var wizard = {
                     _steps: {},
                     _stepsOrder: [],
+                        _stepTemplatePromises: [],
                     _options: {
                         successing: function($data, $step, $isLastStep, callback) {
                             return callback(true);
@@ -35,9 +37,8 @@
                         shadow: true
                     }
                 };
-                wizard.constants = {
-                    finishStepId: '$$finish'
-                };
+
+                    wizard._options = window.angular.extend({}, wizard._options, opts);
 
                 wizard.addStep = function(step) {
                     var self = this;
@@ -45,15 +46,10 @@
                     step.controller = step.controller || window.angular.noop;
                     self._steps[step.id] = step;
                     self._stepsOrder.push(step.id);
-                    _stepTemplatePromises.push(_getTemplatePromise(step));
+                        self._stepTemplatePromises.push(_getTemplatePromise(step));
                     return wizard;
                 };
 
-                wizard.config = function(options) {
-                    var self = this;
-                    self._options = (window.angular.merge || window.angular.extend)({}, self._options, options);
-                    return wizard;
-                };
 
                 wizard.open = function(data, success, cancel) {
                     var self = this;
@@ -62,7 +58,7 @@
                     success = success || window.angular.noop;
                     cancel = cancel || window.angular.noop;
 
-                    $q.all(_stepTemplatePromises).then(function() {
+                        $q.all(self._stepTemplatePromises).then(function () {
                         var instance = $modal.open({
                             templateUrl: self._options.templateUrl,
                             controller: ['$scope', '$modalInstance', '$data', '$steps', '$stepsOrder',
@@ -148,7 +144,7 @@
 
                                 $scope.goById = function(stepOrId, isPrevious) {
                                     var id = window.angular.isString(stepOrId) ? stepOrId : (stepOrId && stepOrId.id);
-                                        if (id === self.constants.finishStepId) {
+                                            if (id === $wizard.$constants.finishStepId) {
                                             $scope.success();
                                         }
                                         else {
@@ -230,7 +226,11 @@
                 };
 
                 return wizard;
-            }());
+                },
+                $constants: {
+                    finishStepId: '$$finish'
+                }
+            };
         }
     ]);
 
