@@ -44,6 +44,7 @@
                     var self = this;
                     step.title = step.title || step.id;
                     step.controller = step.controller || window.angular.noop;
+                        step.parameters = step.parameters || {};
                     self._steps[step.id] = step;
                     self._stepsOrder.push(step.id);
                         self._stepTemplatePromises.push(_getTemplatePromise(step));
@@ -259,6 +260,7 @@
                         var templateScope = scope.$new();
                         templateScope.$context = {
                             data: scope.$data,
+                            parameters: step.parameters,
                             steps: _steps,
                             currentStepId: scope.$current.step && scope.$current.step.id,
                             navigation: {
