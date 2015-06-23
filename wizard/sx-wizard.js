@@ -202,6 +202,18 @@
                                         $scope.goById($scope._history[$scope._history.length - 1], true);
                                     }
                                 };
+                                        $scope.showShadow = function (isLeaving) {
+                                            if (isLeaving) {
+                                                $scope._leaving = true;
+                                            }
+                                            else {
+                                                $scope._entering = true;
+                                            }
+                                        };
+                                        $scope.hideShadow = function () {
+                                            $scope._leaving = false;
+                                            $scope._entering = false;
+                                        };
                                 }
                             ],
                             size: self._options.size,
@@ -242,7 +254,9 @@
                     $data: '=sxWizard',
                     $steps: '=sxWizardSteps',
                     $current: '=sxWizardCurrentStep',
-                    $init: '&sxWizardInit'
+                    $init: '&sxWizardInit',
+                    $showShadow: '&sxWizardShowShadow',
+                    $hideShadow: '&sxWizardHideShadow'
                 },
                 link: function(scope, element, attributes, controllers) {
                     var _stepElements = [];
@@ -269,6 +283,17 @@
                                 buttons: []
                             },
                             behavior: {
+                                shadow: function (isLeaving, fn) {
+                                    try {
+                                        scope.$showShadow(isLeaving);
+                                        return fn(function () {
+                                            scope.$hideShadow();
+                                        });
+                                    }
+                                    catch (_) {
+                                        scope.$hideShadow();
+                                    }
+                                },
                                 entering: function(options, callback) {
                                     return callback();
                                 },

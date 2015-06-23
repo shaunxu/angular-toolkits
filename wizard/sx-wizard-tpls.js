@@ -36,6 +36,8 @@
                 '       sx-wizard-steps="$steps" ' +
                 '       sx-wizard-current-step="$current" ' +
                 '       sx-wizard-buttons="$buttons" ' +
+                '       sx-wizard-show-shadow="showShadow()" ' +
+                '       sx-wizard-hide-shadow="hideShadow()" ' +
                 '       sx-wizard-init="go(0, false)">' +
                 '  </div>' +
                 '</div>' +
