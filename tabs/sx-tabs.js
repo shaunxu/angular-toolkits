@@ -310,8 +310,7 @@
                         }
                         return firstActiveTabId || firstEnabledTabId;
                     };
-                    $q.when(scope.$tabs)
-                        .then(function (tabs) {
+                    $q.when(scope.$tabs).then(function (tabs) {
                         scope.$tabs = tabs;
                         scope.$tabsOrder = (function () {
                             var orders = [];
@@ -327,27 +326,26 @@
                             });
                             return orders;
                         }());
-                            return $q.when(scope.$context);
-                        })
-                        .then(function (context) {
-                            scope.$context = context || {};
+                        return $q.when(scope.$context);
+                    }).then(function (context) {
+                        scope.$context = context || {};
                         scope.showTabsPlusIcon = _getAndUpdateTabsPlusIconFlag();
-                            scope.enabledTabsCount = _getAndUpdateEnabledTabsCount();
-                    // load template for visible tabs
-                    window.angular.forEach(scope.$tabs, function (tab) {
-                        tab.entered = false;
+                        scope.enabledTabsCount = _getAndUpdateEnabledTabsCount();
+                        // load template for visible tabs
+                        window.angular.forEach(scope.$tabs, function (tab) {
+                            tab.entered = false;
                             delete tab.$scope;
                             delete tab.$controller;
-                        _setTemplatePromise(tab);
-                    });
+                            _setTemplatePromise(tab);
+                        });
 
-                            // switch to the active tab
-                            // if no active tab or that tab was disabled then go to the first enabled tab
-                    scope.switchTab({
-                        e: null,
-                                id: _findLandingTab(),
-                        byTabDisabled: true
-                    }, window.angular.noop);
+                        // switch to the active tab
+                        // if no active tab or that tab was disabled then go to the first enabled tab
+                        scope.switchTab({
+                            e: null,
+                                    id: _findLandingTab(),
+                            byTabDisabled: true
+                        }, window.angular.noop);
                     });
                 }
             };
