@@ -59,7 +59,7 @@
                     var _toggleCover = function (showCover, callback) {
                         var containerElement = element.find('.sx-tabs-container');
                         var coverElement = containerElement.find('div.outer');
-                        if (scope.$options.cover.enabled) {
+                        if (scope.$options && scope.$options.cover && scope.$options.cover.enabled) {
                             if (showCover) {
                                 if (scope.$options.cover.autoAdjustHeight) {
                                     $timeout(function () {
