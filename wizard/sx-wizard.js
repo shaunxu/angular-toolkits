@@ -3,8 +3,8 @@
 
     var module = window.angular.module('sx.wizard', ['ui.bootstrap', 'sx.wizard.tpls']);
 
-    module.factory('$wizard', ['$q', '$http', '$templateCache', '$modal', '$wizardConsts',
-        function ($q, $http, $templateCache, $modal, $wizardConsts) {
+    module.factory('$wizard', ['$q', '$http', '$templateCache', '$uibModal', '$wizardConsts',
+        function ($q, $http, $templateCache, $uibModal, $wizardConsts) {
 
                 var _getTemplatePromise = function(step) {
                     if (step.template) {
@@ -60,7 +60,7 @@
                     cancel = cancel || window.angular.noop;
 
                         $q.all(self._stepTemplatePromises).then(function () {
-                        var instance = $modal.open({
+                        var instance = $uibModal.open({
                             templateUrl: self._options.templateUrl,
                             controller: ['$scope', '$modalInstance', '$data', '$steps', '$stepsOrder',
                                 function ($scope, $modalInstance, $data, $steps, $stepsOrder) {
